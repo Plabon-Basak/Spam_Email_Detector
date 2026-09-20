@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import argparse
 import nltk
 import joblib
 from pathlib import Path
@@ -113,9 +114,17 @@ def user_input() -> None:
 
 def main() -> None:
     """Report training metrics and launch the interactive classifier."""
+    parser = argparse.ArgumentParser(description="Spam email classifier")
+    parser.add_argument("--demo", action="store_true", help="Classify a hardcoded sample email and exit")
+    args = parser.parse_args()
+
     print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
     print(f"ROC-AUC: {metrics['roc_auc']:.4f} | CV ROC-AUC: {metrics['cv_roc_auc']:.4f}")
     print(metrics["report"])
+
+    if args.demo:
+        print(predict_email("Congratulations! You've won a free iPhone. Click here to claim now."))
+        return
     user_input()
 
 if __name__ == "__main__":
