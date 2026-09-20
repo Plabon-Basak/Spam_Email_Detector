@@ -64,7 +64,9 @@ def predict_email(email_text: str) -> str:
     processed_text = preprocess_text(email_text)
     vectorized_text = vectorizer.transform([processed_text])
     prediction = model.predict(vectorized_text)
-    return "Spam" if prediction[0] == 1 else "Not Spam"
+    confidence = max(model.predict_proba(vectorized_text)[0])
+    label = "Spam" if prediction[0] == 1 else "Not Spam"
+    return f"{label} (confidence: {confidence * 100:.1f}%)"
 
 def user_input() -> None:
     """Interactive CLI loop that classifies pasted emails until the user exits."""
