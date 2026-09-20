@@ -16,12 +16,6 @@ nltk.download("stopwords")
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words("english"))
 
-# Load dataset
-df = pd.read_csv(BASE_DIR / "mail_data.csv", encoding="latin-1")[["Category", "Message"]]
-df.columns = ["label", "message"]
-df["label"] = df["label"].map({"ham": 0, "spam": 1})
-
-
 def preprocess_text(text):
     text = re.sub(r"\W", " ", text)  # Remove special characters
     text = text.lower()  # Convert to lowercase
@@ -29,20 +23,34 @@ def preprocess_text(text):
     words = [stemmer.stem(word) for word in words if word not in stop_words]  # Remove stopwords and stem words
     return " ".join(words)
 
-df["cleaned_message"] = df["message"].apply(preprocess_text)
 
-vectorizer = TfidfVectorizer(max_features=3000)
-X = vectorizer.fit_transform(df["cleaned_message"])
-y = df["label"]
+def train_model(csv_path=BASE_DIR / "mail_data.csv"):
+    """Load the dataset and return a fitted (vectorizer, model, metrics) tuple."""
+    df = pd.read_csv(csv_path, encoding="latin-1")[["Category", "Message"]]
+    df.columns = ["label", "message"]
+    df["label"] = df["label"].map({"ham": 0, "spam": 1})
+    df["cleaned_message"] = df["message"].apply(preprocess_text)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    vectorizer = TfidfVectorizer(max_features=3000)
+    X = vectorizer.fit_transform(df["cleaned_message"])
+    y = df["label"]
 
-model = LogisticRegression()
-model.fit(X_train, y_train)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-y_pred = model.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred) * 100:.2f}%")
-print(classification_report(y_test, y_pred))
+    model = LogisticRegression()
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+    metrics = {
+        "accuracy": accuracy_score(y_test, y_pred),
+        "report": classification_report(y_test, y_pred),
+    }
+    return vectorizer, model, metrics
+
+
+vectorizer, model, metrics = train_model()
+print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
+print(metrics["report"])
 
 def predict_email(email_text):
     processed_text = preprocess_text(email_text)
