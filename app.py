@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import nltk
+import joblib
 from pathlib import Path
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
@@ -10,6 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
 BASE_DIR = Path(__file__).resolve().parent
+MODEL_DIR = BASE_DIR / "artifacts"
 
 MAX_FEATURES = 3000
 TEST_SIZE = 0.2
@@ -56,6 +58,19 @@ def train_model(csv_path: Path = BASE_DIR / "mail_data.csv"):
 
 
 vectorizer, model, metrics = train_model()
+
+
+def save_model(path: Path = MODEL_DIR / "spam_model.joblib") -> None:
+    """Persist the fitted vectorizer and model to disk with joblib."""
+    MODEL_DIR.mkdir(exist_ok=True)
+    joblib.dump({"vectorizer": vectorizer, "model": model}, path)
+    print(f"Model saved to {path}")
+
+
+def load_model(path: Path = MODEL_DIR / "spam_model.joblib"):
+    """Load a previously saved vectorizer/model bundle from disk."""
+    return joblib.load(path)
+
 
 def predict_email(email_text: str) -> str:
     """Classify a single email message as 'Spam' or 'Not Spam'."""
