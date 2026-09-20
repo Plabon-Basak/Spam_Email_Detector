@@ -40,7 +40,9 @@ def train_model(csv_path: Path = BASE_DIR / "mail_data.csv"):
     X = vectorizer.fit_transform(df["cleaned_message"])
     y = df["label"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
+    )
 
     model = LogisticRegression()
     model.fit(X_train, y_train)
