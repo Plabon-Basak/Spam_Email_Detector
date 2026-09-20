@@ -16,7 +16,8 @@ nltk.download("stopwords")
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words("english"))
 
-def preprocess_text(text):
+def preprocess_text(text: str) -> str:
+    """Clean raw email text: normalize, lowercase, remove stopwords, and stem."""
     text = re.sub(r"\W", " ", text)  # Remove special characters
     text = text.lower()  # Convert to lowercase
     words = text.split()
@@ -24,7 +25,7 @@ def preprocess_text(text):
     return " ".join(words)
 
 
-def train_model(csv_path=BASE_DIR / "mail_data.csv"):
+def train_model(csv_path: Path = BASE_DIR / "mail_data.csv"):
     """Load the dataset and return a fitted (vectorizer, model, metrics) tuple."""
     df = pd.read_csv(csv_path, encoding="latin-1")[["Category", "Message"]]
     df.columns = ["label", "message"]
@@ -52,13 +53,15 @@ vectorizer, model, metrics = train_model()
 print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
 print(metrics["report"])
 
-def predict_email(email_text):
+def predict_email(email_text: str) -> str:
+    """Classify a single email message as 'Spam' or 'Not Spam'."""
     processed_text = preprocess_text(email_text)
     vectorized_text = vectorizer.transform([processed_text])
     prediction = model.predict(vectorized_text)
     return "Spam" if prediction[0] == 1 else "Not Spam"
 
-def user_input():
+def user_input() -> None:
+    """Interactive CLI loop that classifies pasted emails until the user exits."""
     print("Paste the email (multi-line is fine). On its own line type END to classify, or 'exit' to quit :")
     while True:
         lines = []
