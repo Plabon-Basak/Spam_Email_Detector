@@ -8,7 +8,8 @@ from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+from sklearn.model_selection import cross_val_score
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_DIR = BASE_DIR / "artifacts"
@@ -50,8 +51,11 @@ def train_model(csv_path: Path = BASE_DIR / "mail_data.csv"):
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
+    cv_scores = cross_val_score(model, X, y, cv=5, scoring="roc_auc")
     metrics = {
         "accuracy": accuracy_score(y_test, y_pred),
+        "roc_auc": roc_auc_score(y_test, y_pred),
+        "cv_roc_auc": cv_scores.mean(),
         "report": classification_report(y_test, y_pred),
     }
     return vectorizer, model, metrics
@@ -110,6 +114,7 @@ def user_input() -> None:
 def main() -> None:
     """Report training metrics and launch the interactive classifier."""
     print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
+    print(f"ROC-AUC: {metrics['roc_auc']:.4f} | CV ROC-AUC: {metrics['cv_roc_auc']:.4f}")
     print(metrics["report"])
     user_input()
 
