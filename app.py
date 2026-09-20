@@ -59,6 +59,8 @@ vectorizer, model, metrics = train_model()
 
 def predict_email(email_text: str) -> str:
     """Classify a single email message as 'Spam' or 'Not Spam'."""
+    if not email_text or not email_text.strip():
+        return "Not Spam (empty message)"
     processed_text = preprocess_text(email_text)
     vectorized_text = vectorizer.transform([processed_text])
     prediction = model.predict(vectorized_text)
