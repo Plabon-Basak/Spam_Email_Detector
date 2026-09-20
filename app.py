@@ -68,6 +68,12 @@ def predict_email(email_text: str) -> str:
     label = "Spam" if prediction[0] == 1 else "Not Spam"
     return f"{label} (confidence: {confidence * 100:.1f}%)"
 
+
+def predict_emails(emails: list[str]) -> list[str]:
+    """Classify multiple emails at once, returning one prediction per input."""
+    return [predict_email(email) for email in emails]
+
+
 def user_input() -> None:
     """Interactive CLI loop that classifies pasted emails until the user exits."""
     print("Paste the email (multi-line is fine). On its own line type END to classify, or 'exit' to quit :")
