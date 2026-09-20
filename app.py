@@ -18,7 +18,7 @@ TEST_SIZE = 0.2
 RANDOM_STATE = 42
 
 # Download Stopwords
-nltk.download("stopwords")
+nltk.download("stopwords", quiet=True)
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words("english"))
 
