@@ -11,6 +11,10 @@ from sklearn.metrics import accuracy_score, classification_report
 
 BASE_DIR = Path(__file__).resolve().parent
 
+MAX_FEATURES = 3000
+TEST_SIZE = 0.2
+RANDOM_STATE = 42
+
 # Download Stopwords
 nltk.download("stopwords")
 stemmer = PorterStemmer()
@@ -32,11 +36,11 @@ def train_model(csv_path: Path = BASE_DIR / "mail_data.csv"):
     df["label"] = df["label"].map({"ham": 0, "spam": 1})
     df["cleaned_message"] = df["message"].apply(preprocess_text)
 
-    vectorizer = TfidfVectorizer(max_features=3000)
+    vectorizer = TfidfVectorizer(max_features=MAX_FEATURES)
     X = vectorizer.fit_transform(df["cleaned_message"])
     y = df["label"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE)
 
     model = LogisticRegression()
     model.fit(X_train, y_train)
