@@ -56,8 +56,6 @@ def train_model(csv_path: Path = BASE_DIR / "mail_data.csv"):
 
 
 vectorizer, model, metrics = train_model()
-print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
-print(metrics["report"])
 
 def predict_email(email_text: str) -> str:
     """Classify a single email message as 'Spam' or 'Not Spam'."""
@@ -86,10 +84,14 @@ def user_input() -> None:
         print(f"Prediction: {prediction}")
         print()
 
-user_input()
-# # Example
-# email = "Congratulations! You've won a free iPhone. Click here to claim now."
-# print(f"Email: {email}\nPrediction: {predict_email(email)}")
+def main() -> None:
+    """Report training metrics and launch the interactive classifier."""
+    print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
+    print(metrics["report"])
+    user_input()
+
+if __name__ == "__main__":
+    main()
 
 
 
