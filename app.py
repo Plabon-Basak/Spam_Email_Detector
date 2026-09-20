@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import nltk
+from pathlib import Path
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -8,13 +9,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
+BASE_DIR = Path(__file__).resolve().parent
+
 # Download Stopwords
 nltk.download("stopwords")
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words("english"))
 
 # Load dataset
-df = pd.read_csv("d:\\Python Projects 2\\Spam_Email_Detector\\mail_data.csv", encoding="latin-1")[["Category", "Message"]]
+df = pd.read_csv(BASE_DIR / "mail_data.csv", encoding="latin-1")[["Category", "Message"]]
 df.columns = ["label", "message"]
 df["label"] = df["label"].map({"ham": 0, "spam": 1})
 
